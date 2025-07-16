@@ -8,6 +8,7 @@ function [set_line, end_fn, pause_fn, resume_fn, cleanup] = start_spinner()
     is_consumed = false;
     
     graceful_stop = false;
+    is_paused = false;
     
     old_timers = timerfind('Tag', 'start_spinner');
     delete(old_timers);
@@ -22,14 +23,9 @@ function [set_line, end_fn, pause_fn, resume_fn, cleanup] = start_spinner()
     
     start(t);
     
-    function line_handler(line)
-        line_buffer = line;
-        is_consumed = false;
-    end
-    
     function tick(~, ~)
         if graceful_stop && is_consumed
-            stop(t)
+            pause();
         end
         
         if isempty(line_buffer)
@@ -43,7 +39,7 @@ function [set_line, end_fn, pause_fn, resume_fn, cleanup] = start_spinner()
         
         spinner = spinner_chars(spinner_idx);
         spinner_idx = mod(spinner_idx, length(spinner_chars)) + 1;
-    
+        
         format_line = sprintf('%s %s', spinner, line_buffer);
         last_len = print_overwrite(format_line, last_len);
         
@@ -53,37 +49,57 @@ function [set_line, end_fn, pause_fn, resume_fn, cleanup] = start_spinner()
     
     function clean_timer()
         if isvalid(t)
-            stop(t);
+            pause();
             delete(t);
         end
     end
     
-    function end_spinner()
+    function end_spinner(final_msg)
         clean_timer();
         
-        final_msg = sprintf('\n%s\n', line_buffer);
         if isempty(final_msg)
             final_msg = ':) Done!';
         end
-        
-        fprintf(final_msg);
+
+        fprintf('\n%s\n', final_msg);
         is_consumed = true;
     end
     
-    function pause_spinner()
+    function await_pause()
+        if is_paused
+            return
+        end
+        
         graceful_stop = true;
     end
     
-    function resume_spinner()
+    function pause()
+        stop(t)
+        is_paused = true;
+    end
+    
+    function resume()
         graceful_stop = false;
         if isvalid(t)
             start(t);
+            is_paused = false;
+        end
+    end
+    
+    function line_handler(line)
+        line_buffer = line;
+        is_consumed = false;
+        
+        if is_paused
+            format_line = sprintf('* %s', line_buffer);
+            last_len = print_overwrite(format_line, last_len);
+            is_consumed = true;
         end
     end
     
     set_line = @line_handler;
-    pause_fn = @pause_spinner;
-    resume_fn = @resume_spinner;
+    pause_fn = @await_pause;
+    resume_fn = @resume;
     end_fn = @end_spinner;
     cleanup = onCleanup(@() clean_timer());
 end
