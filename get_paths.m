@@ -10,7 +10,8 @@ function paths = get_paths(force_refresh)
         env = load_env('.env');
 
         % Absolute path (do not join with root)
-        paths.timit = env.TIMIT_PATH;
+        paths.timit_pc = env.TIMIT_PATH_PC;
+        paths.timit_node = env.TIMIT_PATH_NODE;
         
         % Relative paths
         paths.root = project_root;
