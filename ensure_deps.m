@@ -19,7 +19,7 @@ function result = ensure_deps()
             missing{end+1} = addonName; %#ok<AGROW>
         end
     end
-
+    
     if isempty(missing)
         disp('[startup] All required add-ons are installed.');
         result = 0;
@@ -28,7 +28,12 @@ function result = ensure_deps()
             strjoin(missing, '\n'));
         
         fprintf('[startup] %s\n', msg);
-        uiwait(msgbox(msg, 'Missing Add-Ons', 'warn'));
+        if usejava('desktop') && feature('ShowFigureWindows')
+            uiwait(msgbox(msg, 'Missing Add-Ons', 'warn'));
+        else
+            warning('[startup] %s\n', msg);
+        end
+
         result = 1;
     end
     
