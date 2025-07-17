@@ -63,7 +63,7 @@ function [report_fn, report_end, cleanup_obj] = progress_report_init(total, opti
         end
         
         if isfield(data, 'type') && strcmp(data.type, "pause")
-            pause_line()
+            pause_line();
         end
         
         if isfield(data, 'type') && strcmp(data.type, "resume")
