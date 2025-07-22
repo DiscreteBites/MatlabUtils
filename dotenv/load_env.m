@@ -1,5 +1,5 @@
 function env = load_env(filename)
-    disp('[ml.system] Loading environment variables')
+    fprintf('[ml.system] Loading environment variables from: %s', filename)
 
     if nargin < 1
         filename = '.env';
