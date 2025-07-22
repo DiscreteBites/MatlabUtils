@@ -56,7 +56,7 @@ function [set_line, end_fn, pause_fn, resume_fn, clean_fn] = start_spinner()
     end
     
     function end_spinner(final_msg)
-        clean_timer(t);
+        clean_timer();
         
         if isempty(final_msg)
             final_msg = ':) Done!';
