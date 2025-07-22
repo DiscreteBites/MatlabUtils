@@ -47,10 +47,11 @@ classdef Concatenator < handle
             for i = 1:num_blocks
                 block = obj.blocks{i};
                 n_rows = size(block, 1);
-
-                indices(i) = row_cursor;
-                out(row_cursor:row_cursor+n_rows-1, :) = block;
-
+                row_end = row_cursor+n_rows-1;
+                
+                indices(i) = row_end;
+                out(row_cursor:row_end, :) = block;
+                
                 row_cursor = row_cursor + n_rows;
             end
         end
