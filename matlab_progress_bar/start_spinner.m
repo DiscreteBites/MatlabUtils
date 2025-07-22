@@ -48,7 +48,6 @@ function [set_line, end_fn, pause_fn, resume_fn, clean_fn] = start_spinner()
     end
     
     function clean_timer()
-        disp('cleaned timer')
         if isvalid(t)
             pause_spinner();
             delete(t);
