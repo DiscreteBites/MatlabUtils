@@ -1,4 +1,4 @@
-function [set_line, end_fn, pause_fn, resume_fn, cleanup] = start_spinner()
+function [set_line, end_fn, pause_fn, resume_fn, clean_fn] = start_spinner()
     spinner_chars = ['|', '/', '-', '\'];
     spinner_idx = 1;
     last_len = 0;
@@ -25,7 +25,7 @@ function [set_line, end_fn, pause_fn, resume_fn, cleanup] = start_spinner()
     
     function tick(~, ~)
         if graceful_stop && is_consumed
-            pause();
+            pause_spinner();
         end
         
         if isempty(line_buffer)
@@ -48,14 +48,15 @@ function [set_line, end_fn, pause_fn, resume_fn, cleanup] = start_spinner()
     end
     
     function clean_timer()
+        disp('cleaned timer')
         if isvalid(t)
-            pause();
+            pause_spinner();
             delete(t);
         end
     end
     
     function end_spinner(final_msg)
-        clean_timer();
+        clean_timer(t);
         
         if isempty(final_msg)
             final_msg = ':) Done!';
@@ -73,7 +74,7 @@ function [set_line, end_fn, pause_fn, resume_fn, cleanup] = start_spinner()
         graceful_stop = true;
     end
     
-    function pause()
+    function pause_spinner()
         stop(t)
         is_paused = true;
     end
@@ -101,5 +102,5 @@ function [set_line, end_fn, pause_fn, resume_fn, cleanup] = start_spinner()
     pause_fn = @await_pause;
     resume_fn = @resume;
     end_fn = @end_spinner;
-    cleanup = onCleanup(@() clean_timer());
+    clean_fn = @clean_timer;
 end

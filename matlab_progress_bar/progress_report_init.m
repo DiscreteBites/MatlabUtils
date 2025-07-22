@@ -1,4 +1,4 @@
-function [report_fn, report_end, cleanup_obj] = progress_report_init(total, options)
+function [report_fn, report_end, cleanup_fn] = progress_report_init(total, options)
     counter = 0;
     bar_width = 40;
     start_time = tic;
@@ -12,25 +12,25 @@ function [report_fn, report_end, cleanup_obj] = progress_report_init(total, opti
     end
     % Start spinner with this live line accessor
 
-    function [set_line, end_line, pause_line, resume_line, clean] = iohandler()
+    function [set_line, end_line, pause_line, resume_line, clean_io] = iohandler()
         if use_spinner
             [
                 set_line, ...
                 end_line, ...
                 pause_line, ...
                 resume_line, ...
-                clean ...
+                clean_io ...
             ] = start_spinner();
         else
             set_line = @(line) disp(line);
             end_line = @(line) disp(line);
             pause_line = @() [];
             resume_line = @() [];
-            clean = [];
+            clean_io = [];
         end
     end
 
-    [set_line, end_line, pause_line, resume_line, clean] = iohandler();
+    [set_line, end_line, pause_line, resume_line, clean_io] = iohandler();
  
     function end_handler()
         elapsed_time = toc(start_time);
@@ -73,7 +73,5 @@ function [report_fn, report_end, cleanup_obj] = progress_report_init(total, opti
     
     report_fn = @handler;
     report_end = @end_handler;
-    cleanup_obj = struct( ...
-        'spinner', clean ...
-    );
+    cleanup_fn = @() clean_io();
 end
