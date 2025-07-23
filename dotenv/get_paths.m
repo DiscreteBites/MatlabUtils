@@ -10,8 +10,8 @@ function paths = get_paths(force_refresh)
         paths = struct();
 
         files = {'.env', '.env.local'};
-        for i = 1: numel(files)
-            env = load_env(files{i});
+        for file_idx = 1: numel(files)
+            env = load_env(files{file_idx});
             
             fields = fieldnames(env);
             
