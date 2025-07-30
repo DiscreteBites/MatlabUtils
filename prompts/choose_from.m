@@ -11,52 +11,35 @@ function [index, answer] = choose_from(options, msg, title_str)
     end
 
     index = 0;
-    answer = '';  % Default in case of cancel or close
+    answer = '';
     
+    has_GUI = false;
+
     try 
         % Check for GUI availability
         if usejava('desktop') && feature('ShowFigureWindows')
-                   
-	        [idx, tf] = listdlg( ...
-		        'PromptString', msg, ...
-		        'SelectionMode', 'single', ...
-		        'ListString', options, ...
-		        'Name', title_str, ...
-                'ListSize', [300 300]);
-        
-	        if tf
-                index = idx;
-		        answer = options{indx};
-	        end
+            has_GUI = true;
         else
             error('No GUI');
         end
     catch
-        % CLI fallback
-        while true
-		    fprintf('%s\n', msg);
-		    for i = 1:numel(options)
-			    fprintf('  [ %d ] %s\n', i, options{i});
-		    end
-		    fprintf('Press Enter without typing a number to cancel.\n');
-		    user_input = strtrim(input('Select an option: ', 's'));
-    
-		    if isempty(user_input)
-			    return;
-		    end
-            
-		    choice = str2double(user_input);
-		    if isnumeric(choice) && ~isnan(choice) && choice >= 1 && choice <= numel(options)
-                index = choice;
-			    answer = options{choice};
-			    return;
-		    else
-			    fprintf('Invalid input. Please enter a number between 1 and %d.\n\n', numel(options));
-		    end
-        end
+        disp("No GUI: displaying CLI fallback")
     end
-
-	
-
-	
+    
+    if has_GUI
+        [idx, tf] = listdlg( ...
+            'PromptString', msg, ...
+            'SelectionMode', 'single', ...
+            'ListString', options, ...
+            'Name', title_str, ...
+            'ListSize', [300 300]);
+    
+        if tf
+            index = idx;
+            answer = options{idx};
+        end
+    else
+        % CLI fallback
+         [index, answer] = CLI_choose_from(options, msg);
+    end
 end

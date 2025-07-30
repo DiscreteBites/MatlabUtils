@@ -8,27 +8,25 @@ function answer = ask_yes_no(msg, title_str)
         title_str = 'Confirm';
     end
     
+    answer = false;
+    has_GUI = false;
+
     try
         % Check for GUI availability
         if usejava('desktop') && feature('ShowFigureWindows')
-            choice = questdlg(msg, title_str, 'Yes', 'No', 'Yes');
-            answer = strcmp(choice, 'Yes');
+            has_GUI = true;
         else
             error('No GUI');
         end
     catch
+       disp("No GUI: displaying CLI fallback")
+    end
+    
+    if has_GUI
+        choice = questdlg(msg, title_str, 'Yes', 'No', 'Yes');
+        answer = strcmp(choice, 'Yes');
+    else
         % CLI fallback
-        while true
-            user_input = lower(strtrim(input([msg ' (y/n): '], 's')));
-            if any(strcmp(user_input, {'y', 'yes'}))
-                answer = true;
-                break;
-            elseif any(strcmp(user_input, {'n', 'no'}))
-                answer = false;
-                break;
-            else
-                fprintf('Please enter y or n.\n');
-            end
-        end
+        answer = CLI_ask_yes_no(msg);
     end
 end
