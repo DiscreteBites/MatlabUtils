@@ -1,4 +1,4 @@
-function answer = choose_from(options, msg, title_str)
+function [index, answer] = choose_from(options, msg, title_str)
 %CHOOSE_FROM Display a dropdown menu to choose from a list of options
 %   answer = choose_from(msg, title_str, options)
 %   - options: cell array of strings
@@ -10,13 +10,14 @@ function answer = choose_from(options, msg, title_str)
         title_str = 'Select Option';
     end
 
+    index = 0;
     answer = '';  % Default in case of cancel or close
     
     try 
         % Check for GUI availability
         if usejava('desktop') && feature('ShowFigureWindows')
                    
-	        [indx, tf] = listdlg( ...
+	        [idx, tf] = listdlg( ...
 		        'PromptString', msg, ...
 		        'SelectionMode', 'single', ...
 		        'ListString', options, ...
@@ -24,6 +25,7 @@ function answer = choose_from(options, msg, title_str)
                 'ListSize', [300 300]);
         
 	        if tf
+                index = idx;
 		        answer = options{indx};
 	        end
         else
@@ -40,12 +42,12 @@ function answer = choose_from(options, msg, title_str)
 		    user_input = strtrim(input('Select an option: ', 's'));
     
 		    if isempty(user_input)
-			    answer = '';
 			    return;
 		    end
             
 		    choice = str2double(user_input);
 		    if isnumeric(choice) && ~isnan(choice) && choice >= 1 && choice <= numel(options)
+                index = choice;
 			    answer = options{choice};
 			    return;
 		    else
